@@ -1,59 +1,36 @@
-from flask import Flask
+from flask import Flask, request, redirect, session
+import os, base64
 app = Flask(__name__)
-import os
+app.secret_key = 'v25friendly'
 
-shops = ["Rongai Shoe Center", "Kitengela Sneakers", "Kware Market"]
+shops = {
+    'Rongai Shoe Center': {'own': 'admin', 'till': '0116782556', 'ok': True, 'lat': -1.3956, 'lng': 36.7562, 'area': 'Rongai Town'},
+    'Kitengela Sneakers': {'own': 'kiten', 'till': '0712345678', 'ok': True, 'lat': -1.38, 'lng': 36.78, 'area': 'Kitengela'},
+    'Kware Market': {'own': 'kware', 'till': '0722000000', 'ok': True, 'lat': -1.40, 'lng': 36.74, 'area': 'Kware'}
+}
+prods = [
+    {'id': 1, 'name': 'Jordan 1', 'price': 4500, 'img': 'https://via.placeholder.com/400', 'shop': 'Rongai Shoe Center', 'stock': 10},
+    {'id': 2, 'name': 'Air Max 90', 'price': 3800, 'img': 'https://via.placeholder.com/400', 'shop': 'Kitengela Sneakers', 'stock': 15}
+]
 
-@app.route("/")
-def home():
-    html = """
-    <style>
-    body{margin:0;background:#f0f2f5;padding-bottom:80px;font-family:Arial;font-size:22px}
-    .card{background:white;margin:10px;padding:16px;border-radius:12px}
-    .btn{padding:16px;width:100%;background:#f68b1e;color:white;border:none;border-radius:10px;font-size:20px;font-weight:bold}
-    .bottom{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:10px;border-top:3px solid #f68b1e}
-    #map{height:85vh;width:100%}
-    </style>
-    <div style=background:#f68b1e;padding:12px><b style=color:white;font-size:24px>EAZYMADE MARKET - ALL SHOPS LIVE</b></div>
-    <div style=background:black;color:white;padding:16px;margin:10px;border-radius:12px;text-align:center>
-    <h2>ALL SHOPS - WHOLE PAGE MAP - BIG FONT</h2>
-    <p>Green deploy test - V24</p>
-    </div>
-    """
-    for s in shops:
-        html += "<div class=card><b>" + s + "</b><br>20 pairs TOTAL - Whole Shop<br><button class=btn>Enter Whole Shop</button></div>"
+STYLE = """
+body{margin:0;background:#f5f5f5;padding-bottom:100px;font-family:Arial}
+.top{background:#f68b1e;padding:12px;display:flex;align-items:center;gap:10px}
+.logo{background:white;color:#f68b1e;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:22px}
+.card{background:white;border-radius:16px;padding:16px;margin:10px;box-shadow:0 2px 8px #0001}
+.btn{padding:18px;border-radius:12px;width:100%;border:none;font-weight:bold;font-size:18px;margin-top:8px}
+.btn-o{background:#f68b1e;color:white}
+.btn-b{background:#111;color:white}
+.btn-g{background:#0a8a0a;color:white}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:10px 0;border-top:3px solid #f68b1e;z-index:999}
+.nav{text-align:center;text-decoration:none;color:#333;font-size:14px;font-weight:bold}
+#map{height:65vh;width:100%;border-radius:12px}
+.badge{background:red;color:white;border-radius:50%;padding:2px 7px;font-size:12px;margin-left:4px}
+"""
+
+def bottom():
+    c = len(session.get('cart', []))
+    b = '<span class=badge>' + str(c) + '</span>' if c > 0 else ''
+    return """
+    <div class=bottom>
     
-    html += """
-    <div class=card><b>Jordan 1</b><br>KSh 4500 - Stock 10<br><button class=btn>Add to Cart BIG</button></div>
-    <div id=map></div>
-    <link rel=stylesheet href=https://unpkg.com/leaflet@1.9.4/dist/leaflet.css>
-    <script src=https://unpkg.com/leaflet@1.9.4/dist/leaflet.js></script>
-    <script>
-    var m=L.map('map').setView([-1.3956,36.7562],12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(m);
-    L.marker([-1.3956,36.7562]).addTo(m).bindPopup('Rongai Shoe Center');
-    L.marker([-1.38,36.78]).addTo(m).bindPopup('Kitengela Sneakers');
-    L.marker([-1.40,36.74]).addTo(m).bindPopup('Kware Market');
-    </script>
-    <div class=bottom><a href=/>Market</a><a href=/map>GPS</a><a href=/post>Post</a><a href=/cart>Cart</a><a href=/register>Join</a></div>
-    """
-    return html
-
-@app.route("/map")
-def mp():
-    return home()
-
-@app.route("/post")
-def post():
-    return "<h2>Post page - Phone upload coming</h2><a href=/>Back</a>"
-
-@app.route("/cart")
-def cart():
-    return "<h2>Cart - Whole Shop Total</h2><a href=/>Back</a>"
-
-@app.route("/register")
-def reg():
-    return "<h2>Register Shop - All Shops Join</h2><a href=/>Back</a>"
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
