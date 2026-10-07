@@ -1,90 +1,103 @@
 from flask import Flask,request,redirect,session
-import os,base64
+import os
 app=Flask(__name__)
-app.secret_key='tiny32'
+app.secret_key="v33"
 
-shops={
-'Rongai':{'own':'admin','ok':True,'lat':-1.3956,'lng':36.7562},
-'Kitengela':{'own':'kiten','ok':True,'lat':-1.38,'lng':36.78}
-}
-prods=[
-{'id':1,'name':'Jordan 1','price':4500,'img':'https://via.placeholder.com/400','shop':'Rongai','stock':10},
-{'id':2,'name':'Air Max','price':3800,'img':'https://via.placeholder.com/400','shop':'Kitengela','stock':15}
-]
-chats={}
+shops={"Rongai":{"own":"admin","ok":True},"Kit":{"own":"kiten","ok":True}}
+prods=[{"id":1,"name":"Jordan 1","price":4500,"shop":"Rongai"},{"id":2,"name":"Air Max","price":3800,"shop":"Kit"}]
 
 def css():
- a='body{margin:0;background:#f5f5f5;'
- b='padding-bottom:120px;font-size:28px;font-family:Arial}'
- c='.top{background:#f68b1e;padding:16px;display:flex}'
- d='.card{background:white;border-radius:18px;'
- e='padding:20px;margin:12px;box-shadow:0 4px 10px #0001}'
- f='.btn{display:block;padding:20px;background:#f68b1e;'
- g='color:white;text-align:center;border-radius:14px;'
- h='text-decoration:none;font-weight:bold;margin-top:10px}'
- i='.bottom{position:fixed;bottom:0;left:0;right:0;'
- j='background:white;display:flex;justify-content:space-around;'
- k='padding:12px 0;border-top:4px solid #f68b1e}'
- l='.nav{text-align:center;text-decoration:none;color:#222;font-size:20px}'
- return a+b+c+d+e+f+g+h+i+j+k+l
+ a="body{margin:0;background:#f5f5f5;padding-bottom:120px;font-size:28px}"
+ b=".top{background:#f68b1e;padding:16px}"
+ c=".card{background:white;border-radius:18px;padding:20px;margin:12px}"
+ d=".btn{display:block;padding:20px;background:#f68b1e;color:white;text-align:center;border-radius:14px;text-decoration:none;margin-top:10px;font-weight:bold}"
+ e=".bottom{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:12px;border-top:4px solid #f68b1e}"
+ return a+b+c+d+e
 
 def nav():
- c=len(session.get('cart',[]))
- b='('+str(c)+')' if c>0 else ''
- return '<div class=bottom><a href=/ class=nav>Market</a><a href=/cart class=nav>Cart '+b+'</a><a href=/ai class=nav>AI</a><a href=/office class=nav>Office</a></div>'
+ c=len(session.get("cart",[]))
+ t="("+str(c)+")" if c>0 else ""
+ return "<div class=bottom><a href=/>Market</a><a href=/cart>Cart "+t+"</a><a href=/ai>AI</a></div>"
 
-@app.route('/')
+@app.route("/")
 def home():
  s=css()
- h='<style>'+s+'</style><div class=top><b style=color:white;font-size:30px>EAZYMADE</b></div>'
- h+='<div class=card><b style=font-size:32px>All Shops 28px</b><p>Buttons fixed - Tiny code</p></div>'
- for name in shops:
-  tot=0
-  for p in prods:
-   if p['shop']==name:
-    tot+=int(p['stock'])
-  h+='<div class=card><b style=font-size:28px>'+name+'</b> '+str(tot)+' pairs<a href=/shop/'+shops[name]['own']+' class=btn>Enter Shop</a><a href=/chat/'+shops[name]['own']+' class=btn style=background:#111>Chat</a></div>'
+ h="<style>"+s+"</style>"
+ h+="<div class=top><b style=color:white;font-size:32px>EAZYMADE 28px</b></div>"
+ h+="<div class=card><b style=font-size:32px>All Shops BIG FONT</b><p>Micro code - phone safe</p></div>"
+ for n in shops:
+  h+="<div class=card><b style=font-size:30px>"+n+"</b><a href=/shop/"+shops[n]["own"]+" class=btn>Enter Shop WORKS</a></div>"
  for p in prods:
-  h+='<div class=card><img src='+p['img']+' style=width:100%;height:200px;object-fit:cover;border-radius:12px><br><b>'+p['name']+'</b> KSh '+str(p['price'])+'<a href=/add/'+str(p['id'])+' class=btn>Add to Cart</a></div>'
- h+='<div class=card><div id=map style=height:50vh></div></div>'
- h+='<link rel=stylesheet href=https://unpkg.com/leaflet@1.9.4/dist/leaflet.css><script src=https://unpkg.com/leaflet@1.9.4/dist/leaflet.js></script><script>var m=L.map("map").setView([-1.3956,36.7562],12);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(m);L.marker([-1.3956,36.7562]).addTo(m);L.marker([-1.38,36.78]).addTo(m);</script>'
+  h+="<div class=card>"+p["name"]+" KSh "+str(p["price"])+"<a href=/add/"+str(p["id"])+" class=btn>Add to Cart WORKS</a></div>"
  h+=nav()
  return h
 
-@app.route('/add/<int:pid>')
+@app.route("/add/<int:pid>")
 def add(pid):
- c=session.get('cart',[])
+ c=session.get("cart",[])
  c.append(pid)
- session['cart']=c
- return redirect('/cart')
+ session["cart"]=c
+ return redirect("/cart")
 
-@app.route('/cart')
+@app.route("/cart")
 def cart():
  s=css()
- c=session.get('cart',[])
- h='<style>'+s+'</style><div class=top><b style=color:white>CART 28px</b></div>'
+ c=session.get("cart",[])
+ h="<style>"+s+"</style><div class=top><b style=color:white>CART 28px</b></div>"
  tot=0
  cnt=0
  for pid in c:
   for p in prods:
-   if p['id']==pid:
-    h+='<div class=card>'+p['name']+' KSh '+str(p['price'])+'</div>'
-    tot+=int(p['price'])
+   if p["id"]==pid:
+    h+="<div class=card>"+p["name"]+" KSh "+str(p["price"])+"</div>"
+    tot+=p["price"]
     cnt+=1
- h+='<div class=card style=background:#111;color:white><b>TOTAL '+str(cnt)+' pairs KSh '+str(tot)+'</b></div>'
- h+='<div class=card><a href=/ class=btn style=background:#111>Continue</a><a href=/clear class=btn style=background:#ddd;color:#111>Clear</a></div>'+nav()
+ h+="<div class=card style=background:#111;color:white><b>TOTAL "+str(cnt)+" pairs KSh "+str(tot)+"</b></div>"
+ h+="<div class=card><a href=/ class=btn style=background:#111>Continue Shopping WORKS</a></div>"
+ h+=nav()
  return h
 
-@app.route('/clear')
-def clear():
- session['cart']=[]
- return redirect('/')
-
-@app.route('/shop/<own>')
+@app.route("/shop/<own>")
 def shop(own):
  s=css()
- sn='Rongai'
+ sn="Rongai"
  for n in shops:
-  if shops[n]['own']==own:
+  if shops[n]["own"]==own:
    sn=n
- h='
+ h="<style>"+s+"</style><div class=top><b style=color:white>"+sn+"</b></div>"
+ h+="<div class=card><b>"+sn+" Whole Shop</b></div>"
+ for p in prods:
+  if p["shop"]==sn:
+   h+="<div class=card>"+p["name"]+"<a href=/add/"+str(p["id"])+" class=btn>Add to Cart</a></div>"
+ h+=nav()
+ return h
+
+@app.route("/ai",methods=["GET","POST"])
+def ai():
+ s=css()
+ ans=""
+ if request.method=="POST":
+  q=request.form.get("q","").lower()
+  if "jordan" in q:
+   ans="Jordan 1 KSh 4500 Rongai"
+  else:
+   ans="Air Max KSh 3800 Kitengela"
+ h="<style>"+s+"</style><div class=top><b style=color:white>AI 28px</b></div>"
+ h+="<div class=card><form method=post><input name=q placeholder=jordan style=width:100%;padding:18px;font-size:24px><button class=btn style=border:none;width:100%>Ask AI WORKS</button></form></div>"
+ if ans!="":
+  h+="<div class=card><b style=font-size:28px>"+ans+"</b></div>"
+ h+=nav()
+ return h
+
+@app.route("/office",methods=["GET","POST"])
+def office():
+ s=css()
+ if request.method=="POST":
+  if request.form.get("password")=="0116782556":
+   session["off"]=True
+ if not session.get("off"):
+  return "<style>"+s+"</style><div class=card><form method=post><input name=password type=password placeholder=0116782556 style=width:100%;padding:18px><button class=btn style=border:none;background:#111>Enter</button></form></div>"+nav()
+ return "<style>"+s+"</style><div class=card><b>Office OK</b></div>"+nav()
+
+if __name__=="__main__":
+ app.run(host="0.0.0.0",port=int(os.environ.get("PORT",10000)))
