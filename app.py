@@ -26,9 +26,9 @@ MPESA_SHORTCODE = os.getenv("MPESA_SHORTCODE", "174379")
 MPESA_KEY = os.getenv("MPESA_KEY", "YOUR_CONSUMER_KEY")
 MPESA_SECRET = os.getenv("MPESA_SECRET", "YOUR_CONSUMER_SECRET")
 
-def lipa_mpesa(phone, amount):
-    print(f"STK PUSH to {phone} Ksh {amount}")
-    return True
+
+    print(f"REAL PAYMENT to 0116782556 Ksh {amount} from {phone}")
+    return f"REAL LIPA: Send {amount} to 0116782556 - Name John Thuo"
 
 def ai_search(query):
     query = query.lower()
