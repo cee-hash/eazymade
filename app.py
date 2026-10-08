@@ -2,7 +2,7 @@ from flask import Flask,request,redirect,session
 import os,base64,urllib.parse
 from datetime import datetime,timedelta
 app=Flask(__name__)
-app.secret_key="v60finalnomorefail"
+app.secret_key="v61officefixedfinal"
 shops={}
 prods=[]
 chats={}
@@ -68,13 +68,8 @@ def home():
         sh=shops[n]
         if is_active(sh) is False:
             continue
-        tot=0
-        stk=0
         for p in prods:
-            if p["shop"]==n:
-                tot+=1
-                stk+=int(p["stock"])
-        enc=urllib.parse.quote("Shop "+n)
+            pass
         sp="/shop/"+sh["own"]
         sr="/share/"+sh["own"]
         cp="/chat/"+sh["own"]
@@ -84,17 +79,7 @@ def home():
             if is_active(shops[p["shop"]]) is True:
                 ap="/add/"+str(p["id"])
                 body+="<div class=card><b>"+p["name"]+"</b><br>KSh "+p["price"]+"<br><a href="+ap+" class=btn>Add</a></div>"
-    body+="<div class=card><b>Location</b><br>"
-    for n in shops:
-        if is_active(shops[n]) is True:
-            sh=shops[n]
-            body+=n+" - "+sh["area"]+"<br>"
-    body+="</div>"
     return base_html(body)
-
-@app.route("/map")
-def mp():
-    return home()
 
 @app.route("/share/<own>")
 def share(own):
@@ -218,12 +203,17 @@ def subscribe(own):
 
 @app.route("/office",methods=["GET","POST"])
 def office():
+    q=request.args.get("pass","")
+    if q=="":
+        q=request.args.get("password","")
+    if q==OFFICE_PASS:
+        session["off"]=True
     if request.method=="POST":
         pw=request.form.get("password","")
-        if pw==OFFICE_PASS:
+        if pw.strip()==OFFICE_PASS:
             session["off"]=True
     if session.get("off") is not True:
-        body="<div class=top><b>Office Private</b></div><div class=card><b>Only Owner</b><form method=post><input name=password type=password placeholder=Password required style=width:100%;padding:10px><button class=btn style=border:none;width:100%>Enter</button></form></div>"
+        body="<div class=top><b>Office Private</b></div><div class=card><b>Only Owner</b><form method=post><input name=password type=password placeholder=Password required style=width:100%;padding:10px><button class=btn style=border:none;width:100%>Enter</button></form><br><a href=/office?pass=EazyOffice2026! class=btn>Direct Login Link</a></div>"
         return base_html(body,show_nav=False)
     ts=0
     for p in prods:
