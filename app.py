@@ -2,14 +2,13 @@ from flask import Flask,request,redirect,session
 import os,base64,urllib.parse
 from datetime import datetime,timedelta
 app=Flask(__name__)
-app.secret_key="v42fixedtrial"
+app.secret_key="v43fixtrialgreen"
 
 shops={}
 prods=[]
 chats={}
 
 DELIVERY=300
-SALE_CUT=0.05
 SUB_FEE=500
 
 def auto_samples(shop_name):
@@ -26,9 +25,8 @@ def auto_samples(shop_name):
 def is_active(sh):
  if not sh:
   return False
- if sh.get("sub",False):
+ if sh.get("sub"):
   return True
- # trial check
  try:
   end=sh.get("trial_end")
   if end:
@@ -50,38 +48,15 @@ def days_left(sh):
    if delta.days>=0:
     return delta.days+1
  except:
-  return 0
+  pass
  return 0
 
 def css():
  return "body{margin:0;background:#f0f2f5;padding-bottom:140px;font-family:Arial;font-size:30px}.top{background:linear-gradient(90deg,#f68b1e,#ff9a3d);padding:20px;position:sticky;top:0;z-index:100}.card{background:white;border-radius:22px;padding:26px;margin:16px;box-shadow:0 6px 18px #0001;border-left:10px solid #f68b1e}.btn{display:block;padding:26px;border-radius:18px;width:100%;text-align:center;text-decoration:none!important;font-weight:bold;font-size:26px;margin-top:14px;color:white!important}.btn-o{background:linear-gradient(90deg,#f68b1e,#ff6a00)}.btn-b{background:#111}.btn-w{background:white;color:#f68b1e!important;border:3px solid #f68b1e}.bottom{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:16px 0;border-top:5px solid #f68b1e;z-index:999}.nav{text-align:center;text-decoration:none;color:#222;font-size:20px;font-weight:bold}#map{height:65vh;width:100%;border-radius:20px}.chat-msg{background:#f0f2f5;padding:18px;border-radius:16px;margin:10px 0;font-size:26px;border-left:6px solid #f68b1e}"
 
 def nav():
- c=session.get("cart",[])
- t="("+str(len(c))+")" if c else ""
- return "<div class=bottom><a href='/' class='nav'>Market<br>🏪</a><a href='/register' class='nav'>Register<br>➕</a><a href='/post' class='nav'>Post<br>📸</a><a href='/cart' class='nav'>Cart "+t+"<br>🛒</a><a href='/office' class='nav'>Office<br>💼</a></div>"
-
-@app.errorhandler(404)
-def nf(e):
- return redirect("/")
-
-@app.route("/")
-def home():
- s=css()
- h="<style>"+s+"</style>"
- h+="<div class=top><b style=color:white;font-size:34px>EAZYMADE MARKET</b><div style=color:white;font-size:20px>Shops Near You</div></div>"
- h+="<div class='card' style='background:linear-gradient(135deg,#f68b1e,#000);color:white;border-left:none;text-align:center'><b style=font-size:34px>Welcome</b><p style=font-size:24px>"+str(len(shops))+" Shops - "+str(len(prods))+" Shoes</p><a href='/register' class='btn' style='background:#0a8a0a'>Register Your Shop - 1 Week Free</a><a href='/map' class='btn' style='background:white;color:#f68b1e!important'>View Map</a></div>"
- if not shops:
-  h+="<div class=card><b>No shops yet</b><br><span style=font-size:24px>Be first to register - 1 week free trial</span><br><a href='/register' class='btn btn-o'>Register Now</a></div>"
- for name in shops:
-  sh=shops[name]
-  if not is_active(sh):
-   continue
-  tot=0
-  stock_tot=0
-  for p in prods:
-   if p["shop"]==name:
-    tot+=1
-    stock_tot+=int(p["stock"])
-  dl=days_left(sh)
-  trial_txt=" - "+str(dl)+" days free trial left" if dl>0 and not sh.get("sub")
+ cart=session.get("cart",[])
+ txt=""
+ if cart:
+  txt="("+str(len(cart))+")"
+ return "<div class=bottom><a href='/' class='nav'>Market<br>🏪</a><a href='/register' class='nav'>Register<br>➕</a><a href='/post' class='nav'>Post<br>📸</a><a href='/cart' class='nav'>
