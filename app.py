@@ -2,7 +2,7 @@ from flask import Flask,request,redirect,session
 import os,base64,urllib.parse
 from datetime import datetime,timedelta
 app=Flask(__name__)
-app.secret_key="v55copyrightgreen"
+app.secret_key="v56finalgreenfix"
 shops={}
 prods=[]
 chats={}
@@ -82,5 +82,22 @@ def home():
         cp="/chat/"+sh["own"]
         body+="<div class=card><b>"+name+"</b><br>"+sh["area"]+" - "+str(tot)+" Types - "+str(stk)+" Pairs<br><a href="+sp+" class=btn>Enter Shop</a><a href="+sr+" class=btn>Share</a><a href=https://wa.me/?text="+enc+" target=_blank class=btn>WhatsApp</a><a href="+cp+" class=btn>Chat</a></div>"
     for p in prods:
-        if p["shop"] in shops:
-            if is_active(shops[p["shop"]])==True:
+        if p["shop"] in shops and is_active(shops[p["shop"]])==True:
+            ap="/add/"+str(p["id"])
+            body+="<div class=card><img src="+p["img"]+" style=width:100%><br><b>"+p["name"]+"</b><br>KSh "+p["price"]+"<br><a href="+ap+" class=btn>Add to Cart</a></div>"
+    body+="<div class=card><b>Shops Location</b><br>"
+    for n in shops:
+        if is_active(shops[n])==True:
+            sh=shops[n]
+            body+=n+" - "+sh["area"]+"<br>"
+    body+="</div>"
+    return base_html(body)
+
+@app.route("/map")
+def mp():
+    return home()
+
+@app.route("/share/<own>")
+def share(own):
+    sn=""
+    for n in shops
