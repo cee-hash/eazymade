@@ -2,7 +2,7 @@ from flask import Flask,request,redirect,session
 import os,base64,urllib.parse
 from datetime import datetime,timedelta
 app=Flask(__name__)
-app.secret_key="v56finalgreenfix"
+app.secret_key="v57finalgreen5times"
 shops={}
 prods=[]
 chats={}
@@ -66,7 +66,7 @@ def home():
     body+="<div class=card><b>Welcome</b><br>"+str(len(shops))+" Shops - "+str(len(prods))+" Shoes<br><a href=/register class=btn>Register 1 Week Free</a></div>"
     if len(shops)==0:
         body+="<div class=card><b>No shops yet</b><br><a href=/register class=btn>Register Now</a></div>"
-    for name in shops:
+    for name in list(shops.keys()):
         sh=shops[name]
         if is_active(sh)==False:
             continue
@@ -86,7 +86,7 @@ def home():
             ap="/add/"+str(p["id"])
             body+="<div class=card><img src="+p["img"]+" style=width:100%><br><b>"+p["name"]+"</b><br>KSh "+p["price"]+"<br><a href="+ap+" class=btn>Add to Cart</a></div>"
     body+="<div class=card><b>Shops Location</b><br>"
-    for n in shops:
+    for n in list(shops.keys()):
         if is_active(shops[n])==True:
             sh=shops[n]
             body+=n+" - "+sh["area"]+"<br>"
@@ -100,4 +100,25 @@ def mp():
 @app.route("/share/<own>")
 def share(own):
     sn=""
-    for n in shops
+    for n in list(shops.keys()):
+        if shops[n]["own"]==own:
+            sn=n
+    if sn=="":
+        return redirect("/")
+    dl=days_left(shops[sn])
+    msg="Shop "+sn+" on EAZYMADE © 2026"
+    enc=urllib.parse.quote(msg)
+    body="<div class=top><b>Share "+sn+"</b></div>"
+    body+="<div class=card><b>Ready - "+str(dl)+" Days Free</b></div>"
+    body+="<div class=card><a href=https://wa.me/?text="+enc+" target=_blank class=btn>WhatsApp</a><a href=https://www.facebook.com/sharer/sharer.php target=_blank class=btn>Facebook</a><a href=https://www.tiktok.com/upload target=_blank class=btn>TikTok</a></div>"
+    body+="<div class=card><a href=/ class=btn>Market</a></div>"
+    return base_html(body)
+
+@app.route("/add/<int:pid>")
+def add(pid):
+    c=session.get("cart",[])
+    c.append(pid)
+    session["cart"]=c
+    return redirect("/cart")
+
+@app.route("/
