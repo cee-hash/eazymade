@@ -2,7 +2,7 @@ from flask import Flask,request,redirect,session
 import os,base64,urllib.parse
 from datetime import datetime,timedelta
 app=Flask(__name__)
-app.secret_key="v59shortgreen"
+app.secret_key="v60finalnomorefail"
 shops={}
 prods=[]
 chats={}
@@ -299,4 +299,5 @@ def post():
     body="<div class=top><b>Post</b></div><div class=card><b>Bulk</b><form method=post><select name=shop_select>"+opts+"</select><textarea name=bulk placeholder=Name Price Stock></textarea><button class=btn>Post Many</button></form></div><div class=card><form method=post enctype=multipart/form-data><select name=shop_select>"+opts+"</select><input name=name placeholder=Name required><input name=price placeholder=Price required><input name=stock placeholder=Stock required><input type=file name=pic accept=image/*><button class=btn>Post</button></form></div>"
     return base_html(body)
 
-if __name__=="__main
+if True:
+    app.run(host='0.0.0.0',port=10000)
